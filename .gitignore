@@ -113,3 +113,6 @@ auth.py
 logs/*
 scratch/*
 *.tsv
+
+.env
+output.txt
