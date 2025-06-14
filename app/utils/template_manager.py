@@ -688,7 +688,7 @@ def record_llm_usage(name: str, tokens: int) -> None:
 
     os.makedirs(os.path.dirname(LLM_USAGE_PATH), exist_ok=True)
     try:
-        with open(LLM_USAGE_PATH, "r") as f:
+        with open(LLM_USAGE_PATH) as f:
             data = json.load(f)
     except Exception:
         data = {}
@@ -731,7 +731,7 @@ def get_llm_response_count(name: str) -> int:
         return 0
 
     try:
-        with open(LLM_USAGE_PATH, "r") as f:
+        with open(LLM_USAGE_PATH) as f:
             data = json.load(f)
     except Exception:
         return 0
@@ -756,7 +756,7 @@ def get_llm_cost_estimate(
         return "$0.00"
 
     try:
-        with open(LLM_USAGE_PATH, "r") as f:
+        with open(LLM_USAGE_PATH) as f:
             data = json.load(f)
     except Exception:
         data = {}
@@ -798,7 +798,7 @@ def get_llm_cost_summary(
     """
 
     try:
-        with open(LLM_USAGE_PATH, "r") as f:
+        with open(LLM_USAGE_PATH) as f:
             data = json.load(f)
     except Exception:
         data = {}

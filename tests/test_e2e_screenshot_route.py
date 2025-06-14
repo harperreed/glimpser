@@ -57,7 +57,9 @@ def screenshot_server(tmp_path):
 
         def first(self):
             return SimpleNamespace(
-                id=1, username="admin", password_hash="hash"  # pragma: allowlist secret
+                id=1,
+                username="admin",
+                password_hash="hash",  # pragma: allowlist secret
             )
 
     class DummySession:

@@ -10,7 +10,6 @@ import math
 import os
 import subprocess
 import time
-from typing import Optional
 
 from dateutil import tz
 from PIL import Image, ImageDraw, ImageEnhance, ImageFont
@@ -233,7 +232,7 @@ def _generate_qr_code(data: str, size: int) -> Image.Image:
 def generate_test_pattern(
     width: int = 1280,
     height: int = 720,
-    logo_path: Optional[str] = None,
+    logo_path: str | None = None,
     camera_name: str | None = None,
     variant: str = "color",
     spinner: str | None = None,
@@ -254,7 +253,7 @@ def generate_test_pattern(
         (height, (0, 0, 0)),
     ]
     for y in range(height):
-        for (y0, c0), (y1, c1) in zip(stops, stops[1:]):
+        for (y0, c0), (y1, c1) in zip(stops, stops[1:], strict=False):
             if y0 <= y <= y1:
                 ratio = (y - y0) / (y1 - y0)
                 r = int(c0[0] * (1 - ratio) + c1[0] * ratio)

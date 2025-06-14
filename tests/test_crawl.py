@@ -9,7 +9,6 @@ from app.utils.screenshots import get_arp_output, is_address_reachable, parse_ur
 
 
 class TestURLParsing(unittest.TestCase):
-
     def test_parse_url_http(self):
         url = "http://example.com:8080/some/path"
         domain, port = parse_url(url)
@@ -36,26 +35,24 @@ class TestURLParsing(unittest.TestCase):
 
 
 class TestARPTable(unittest.TestCase):
-
     @patch("subprocess.check_output")
     def test_get_arp_output_linux(self, mock_check_output):
-        mock_check_output.return_value = b"192.168.0.1 dev eth0 lladdr 00:11:22:33:44:55 REACHABLE"
+        mock_check_output.return_value = (
+            b"192.168.0.1 dev eth0 lladdr 00:11:22:33:44:55 REACHABLE"
+        )
         ip_address = "192.168.0.1"
         result = get_arp_output(ip_address, timeout=5)
         self.assertIn(b"REACHABLE", result)
 
     @patch("subprocess.check_output")
     def test_get_arp_output_windows(self, mock_check_output):
-        mock_check_output.return_value = (
-            b"Internet Address      Physical Address      Type\n192.168.0.1          00-11-22-33-44-55     dynamic"
-        )
+        mock_check_output.return_value = b"Internet Address      Physical Address      Type\n192.168.0.1          00-11-22-33-44-55     dynamic"
         ip_address = "192.168.0.1"
         result = get_arp_output(ip_address, timeout=5)
         self.assertIn(b"dynamic", result)
 
 
 class TestIPAddressValidation(unittest.TestCase):
-
     @patch("socket.gethostbyname")
     def test_is_address_reachable_success(self, mock_gethostbyname):
         mock_gethostbyname.return_value = "93.184.216.34"  # example.com IP

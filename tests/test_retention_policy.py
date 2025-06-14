@@ -20,7 +20,6 @@ from app.utils.retention_policy import (
 
 
 class TestRetentionPolicy(unittest.TestCase):
-
     def test_delete_old_files(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create dummy files in sequence so creation times increase

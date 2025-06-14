@@ -493,7 +493,7 @@ def login_required(f: Callable) -> Callable:
             if not isinstance(session.get("user_id"), int):
                 session.pop("user_id", None)
                 flash("Session expired. Please log in again.")
-                return redirect(url_for("login", next=request.url))
+                return redirect(url_for("auth.login", next=request.url))
 
             expiry = session.get("expiry")
             if expiry and datetime.now() > datetime.strptime(
@@ -501,7 +501,7 @@ def login_required(f: Callable) -> Callable:
             ):
                 session.pop("user_id", None)
                 flash("Session expired. Please log in again.")
-                return redirect(url_for("login", next=request.url))
+                return redirect(url_for("auth.login", next=request.url))
 
             # Refresh expiry so the timeout is based on inactivity
             timeout = (
@@ -526,7 +526,7 @@ def login_required(f: Callable) -> Callable:
             if not user:
                 session.pop("user_id", None)
                 flash("Session expired. Please log in again.")
-                return redirect(url_for("login", next=request.url))
+                return redirect(url_for("auth.login", next=request.url))
 
             # Optional role checks could be added here
             return f(*args, **kwargs)
@@ -554,7 +554,7 @@ def login_required(f: Callable) -> Callable:
                         "error",
                     )
                     logging.debug("Missing session cookie from %s", request.remote_addr)
-                return redirect(url_for("login", next=request.url))
+                return redirect(url_for("auth.login", next=request.url))
 
     return decorated_function
 
@@ -1357,7 +1357,6 @@ def allowed_filename(filename: str) -> bool:
         return False
 
     if re.findall(r"^[a-zA-Z0-9\.\-_]+?$", filename):
-
         return True
 
     return False
@@ -1416,7 +1415,6 @@ def init_routes(app: Flask) -> None:
     @login_required
     @profile_route("/health")
     def health_check():
-
         scheduler_status = "failed"
         free_gb = 0
 
@@ -1857,7 +1855,7 @@ def init_routes(app: Flask) -> None:
         if token != config.SSO_TOKEN or not token:
             flash("Invalid SSO token", "error")
             logging.warning("Invalid SSO token from %s", request.remote_addr)
-            return redirect(url_for("login"))
+            return redirect(url_for("auth.login"))
 
         db_session = SessionLocal()
         try:
@@ -1870,7 +1868,7 @@ def init_routes(app: Flask) -> None:
         if not user:
             flash("Configured SSO user not found", "error")
             logging.error("SSO user %s not found", config.SSO_USERNAME)
-            return redirect(url_for("login"))
+            return redirect(url_for("auth.login"))
 
         session["user_id"] = user.id
         session["expiry"] = (
@@ -1930,7 +1928,7 @@ def init_routes(app: Flask) -> None:
         session.pop("user_id", None)
         flash("You have been logged out successfully.", "success")
         # add query flag so client can clear persistent credentials
-        return redirect(url_for("login", logout="1"))
+        return redirect(url_for("auth.login", logout="1"))
 
     @app.route("/")
     @login_required
@@ -2057,7 +2055,6 @@ def init_routes(app: Flask) -> None:
     @app.route("/stream.png")
     @login_required
     def stream_png():
-
         group = request.args.get("group")
         camera = request.args.get("camera")
         if group == "all":
@@ -2199,7 +2196,6 @@ def init_routes(app: Flask) -> None:
     )
     @login_required
     def handle_rtsp():
-
         session_id = request.headers.get("Session", str(uuid.uuid4()))
         cseq = request.headers.get("CSeq", "0")
 
@@ -4124,7 +4120,6 @@ def init_routes(app: Flask) -> None:
     @app.route("/stream_logs")
     @login_required
     def stream_logs():
-
         level = request.args.get("level")
         source = request.args.get("source")
         start_date = request.args.get("start_date")

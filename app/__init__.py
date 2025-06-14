@@ -115,9 +115,9 @@ def create_app(
     os.makedirs(SUMMARIES_DIRECTORY, exist_ok=True)
     os.makedirs(CLIPS_DIRECTORY, exist_ok=True)
 
-    from app.routes import init_routes
+    from app.blueprints.registry import register_blueprints
 
-    init_routes(app)
+    register_blueprints(app)
 
     # Configure the scheduler executor
     if schedule is True:

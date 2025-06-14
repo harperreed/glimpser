@@ -12,7 +12,6 @@ from app.utils.screenshots import add_timestamp, is_mostly_blank, remove_backgro
 
 
 class TestFileRetention(unittest.TestCase):
-
     def test_delete_old_files(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create some dummy files
@@ -32,7 +31,6 @@ class TestFileRetention(unittest.TestCase):
 
 
 class TestImageProcessing(unittest.TestCase):
-
     def test_add_timestamp(self):
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_file:
             image_path = temp_file.name
@@ -71,8 +69,8 @@ class TestImageProcessing(unittest.TestCase):
             self.assertTrue(result)
 
         with Image.new("RGB", (100, 100), color="white") as img:
-            for x in range(0, 100):
-                for y in range(0, 60):
+            for x in range(100):
+                for y in range(60):
                     img.putpixel((x, y), (0, 0, 0))
             result = is_mostly_blank(img)
             self.assertFalse(result)

@@ -12,7 +12,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 
 class TestJSONParsing(unittest.TestCase):
-
     def test_valid_json_parsing(self):
         valid_json = '{"name": "test", "value": 123}'
         data = json.loads(valid_json)
@@ -26,7 +25,6 @@ class TestJSONParsing(unittest.TestCase):
 
 
 class TestCommandExecution(unittest.TestCase):
-
     @patch("subprocess.check_output")
     def test_successful_command_execution(self, mock_check_output):
         mock_check_output.return_value = b"command output"

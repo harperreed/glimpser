@@ -445,7 +445,7 @@ def _probe_onvif(timeout=2):
         while True:
             try:
                 data, addr = sock.recvfrom(4096)
-            except socket.timeout:
+            except TimeoutError:
                 break
             ip = addr[0]
             info = {}
@@ -542,7 +542,7 @@ def _probe_ssdp(timeout: int = 2, max_duration: int = 5) -> list[dict]:
                 break
             try:
                 resp, addr = sock.recvfrom(1024)
-            except socket.timeout:
+            except TimeoutError:
                 continue
             ip = addr[0]
             port = 80

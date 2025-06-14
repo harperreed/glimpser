@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Build a macOS bundle using PyInstaller."""
+
 import os
 
 import PyInstaller.__main__

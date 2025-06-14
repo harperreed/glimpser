@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import curses
 import time
-from typing import Any
 
 from .scheduling import get_feed_status
 

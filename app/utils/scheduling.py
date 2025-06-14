@@ -8,7 +8,6 @@ import multiprocessing
 import os
 import random
 import re
-import select
 import shutil
 import subprocess
 import textwrap
@@ -437,7 +436,6 @@ def add_motion_and_caption(image_path, caption=None, motion=False):
 
 
 def update_camera(name, template, image_file=None, motion=False):
-
     # just ignore the old
     template = get_template(name)
 
@@ -654,7 +652,6 @@ def update_camera(name, template, image_file=None, motion=False):
 
         # run the object detect AFTER the motion detetor
         if allow is True and object_filter and object_confidence is not None:
-
             global clip_session, clip_processor
 
             # Prefer the lightweight ONNX backend when available
@@ -665,7 +662,7 @@ def update_camera(name, template, image_file=None, motion=False):
                     # Prefer GPU when available and fall back to CPU. This uses
                     # the providers reported by onnxruntime so it works even
                     # when CUDA is not installed.
-                    available = getattr(ort, "get_available_providers", lambda: [])()
+                    available = getattr(ort, "get_available_providers", list)()
                     providers = (
                         ["CUDAExecutionProvider"]
                         if "CUDAExecutionProvider" in available
@@ -715,7 +712,6 @@ def update_camera(name, template, image_file=None, motion=False):
                 # print(f"Object '{object_filter}' detected in {name} with confidence {probs[0, 0]}")
 
         if allow:
-
             # allow this to run one time if we have no detection
             #  generate the symlink. if there is a data/screenshots/<camera>/last_motion.png, please rename the move the symlink to prev_motion.png
             #    then, create the symlink for last_motion.png to point to the new png_files[-1]
@@ -911,7 +907,6 @@ def init_crawl():
 
 
 def update_summary():
-
     # summarize all of htis together
     lstring = "The following are a list of real time dashboards and cameras, and their recent status updates:\n"
     templates = get_templates_sorted_by_last_caption_time()
@@ -1313,7 +1308,7 @@ def cache_logs():
     open(log_file_path, "a").close()
 
     try:
-        with open(log_file_path, "r") as file:
+        with open(log_file_path) as file:
             file.seek(0, os.SEEK_END)  # Start at end of file
             while not stop_event.is_set():
                 new_log = file.readline()

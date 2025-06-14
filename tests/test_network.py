@@ -1,7 +1,6 @@
 # tests/test_network.py
 
 import os
-import socket
 import sys
 import tempfile
 import unittest
@@ -20,7 +19,6 @@ from app.utils.screenshots import (
 
 
 class TestUtils(unittest.TestCase):
-
     def test_get_files_sorted_by_creation_time_empty(self):
         # Test an empty directory
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -56,7 +54,7 @@ class TestUtils(unittest.TestCase):
     @patch("socket.socket")
     def test_is_port_open(self, mock_socket):
         mock_instance = mock_socket.return_value.__enter__.return_value
-        mock_instance.connect.side_effect = [None, socket.timeout(), socket.timeout()]
+        mock_instance.connect.side_effect = [None, TimeoutError(), TimeoutError()]
 
         self.assertTrue(is_port_open("google.com", 80))
         self.assertFalse(is_port_open("google.com", 12345))

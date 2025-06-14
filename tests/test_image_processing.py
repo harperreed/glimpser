@@ -22,7 +22,6 @@ from app.utils.screenshots import (
 
 
 class TestImageProcessing(unittest.TestCase):
-
     def test_add_timestamp(self):
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as temp_file:
             image_path = temp_file.name

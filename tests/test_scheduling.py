@@ -15,14 +15,13 @@ from app.utils.scheduling import find_closest_image, scheduler, start_log_cachin
 
 
 class TestScheduler(unittest.TestCase):
-
     @patch("time.sleep", return_value=None)  # Corrected patch target
     def test_schedule_job(self, mock_sleep):
         job = MagicMock()
 
         try:
             scheduler.remove_job("test_job")
-        except Exception as e:
+        except Exception:
             pass
         # Schedule a job using add_job with correct argument passing
         scheduler.add_job(func=job, trigger="interval", seconds=5, id="test_job")
@@ -61,11 +60,11 @@ class TestScheduler(unittest.TestCase):
 
         try:
             scheduler.remove_job("test_job1")
-        except Exception as e:
+        except Exception:
             pass
         try:
             scheduler.remove_job("test_job2")
-        except Exception as e:
+        except Exception:
             pass
 
         # Schedule the jobs using add_job with correct argument passing
@@ -95,7 +94,7 @@ class TestScheduler(unittest.TestCase):
         # Schedule a job
         try:
             scheduler.remove_job("test_job")
-        except Exception as e:
+        except Exception:
             pass
         scheduler.add_job(func=job, trigger="interval", seconds=5, id="test_job")
 

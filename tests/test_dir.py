@@ -8,7 +8,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 
 class TestDirectoryManagement(unittest.TestCase):
-
     def test_directory_creation(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             new_dir = os.path.join(temp_dir, "subdir")

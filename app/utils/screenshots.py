@@ -1,6 +1,5 @@
 # utils/screenshots.py
 
-import base64
 import datetime
 import io
 import ipaddress
@@ -15,7 +14,6 @@ import socket
 import subprocess
 import tempfile
 import time
-from typing import Optional
 from urllib.parse import urlparse
 
 import psutil
@@ -32,7 +30,6 @@ logging.getLogger("urllib3").setLevel(logging.ERROR)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 import threading
-from typing import Dict
 
 import numpy as np
 import requests
@@ -80,7 +77,7 @@ from app.config import (
 )
 from app.utils.validators import validate_proxy, validate_url
 
-FFMPEG_AVAILABLE: Optional[bool] = None
+FFMPEG_AVAILABLE: bool | None = None
 
 last_camera_test = {}
 last_camera_test_time = {}
@@ -92,7 +89,7 @@ lurl_cache = {}
 lurl_cache_time = {}
 throttle_cache = {}
 chrome_version = {}
-_browser_gl_cache: Dict[str, bool] = {}
+_browser_gl_cache: dict[str, bool] = {}
 last_modified_cache = {}
 etag_cache = {}
 
@@ -108,7 +105,7 @@ def _load_status_cache() -> None:
     if not os.path.exists(STATUS_CACHE_PATH):
         return
     try:
-        with open(STATUS_CACHE_PATH, "r") as f:
+        with open(STATUS_CACHE_PATH) as f:
             data = json.load(f)
     except Exception:
         return
@@ -192,7 +189,7 @@ def load_font(size):
     for font_name in FONT_CANDIDATES:
         try:
             return ImageFont.truetype(font_name, size)
-        except IOError:
+        except OSError:
             continue
     return ImageFont.load_default()
 
@@ -289,7 +286,6 @@ import ctypes
 import ctypes.util
 import os
 import threading
-import time
 
 _idle_lock = threading.Lock()
 _x11 = None
@@ -404,7 +400,6 @@ def idle_seconds_loginctl() -> int:
 
 # Function to detect user activity
 def check_user_activity(timeout=10):
-
     global user_active
     user_active = False
 
@@ -577,7 +572,9 @@ def adjust_bbox_to_aspect_ratio(bbox, image_size, aspect_ratio=(16, 9)):
 
 def is_similar_color(color1, color2, threshold):
     """Check if two colors are similar."""
-    return all(abs(c1 - c2) <= threshold for c1, c2 in zip(color1, color2))
+    return all(
+        abs(c1 - c2) <= threshold for c1, c2 in zip(color1, color2, strict=False)
+    )
 
 
 def is_mostly_blank(
@@ -1026,7 +1023,6 @@ def is_private_ip(ip_address):
 
 
 def is_address_reachable(address, port=80, timeout=5):
-
     if port is None:
         port = 80
 
@@ -1108,7 +1104,6 @@ def parse_url(url):
 
 
 def cas_error(url):
-
     entry = throttle_cache.setdefault(url, {"errors": 0, "first": time.time()})
 
     if entry.get("last", 0) > time.time() - 60 * 5:
@@ -2098,7 +2093,6 @@ def kill_driver_process(driver):
 
 
 def launch_headless_chrome(driver_options, version=None):
-
     driver = None
     try:
         # note - version not working
@@ -2566,7 +2560,7 @@ def capture_screenshot_and_har(
         if popup_xpath:
             try:
                 _remove_popup(driver, popup_xpath)
-            except Exception as e:
+            except Exception:
                 # logging.info(f"Could not remove popup={popup_xpath}:")
                 pass
 
@@ -2577,7 +2571,7 @@ def capture_screenshot_and_har(
                 driver.execute_script("arguments[0].scrollIntoView(true);", element)
                 time.sleep(1)
                 element.screenshot(partial_screenshot)
-            except Exception as e:
+            except Exception:
                 pass
 
         # Fallback to entire page if partial didn't get created
@@ -2593,9 +2587,9 @@ def capture_screenshot_and_har(
             partial_screenshot, output_path, name, invert, dark
         )
 
-    except TimeoutException as e:
+    except TimeoutException:
         logging.warning(f"[capture_screenshot_and_har] Timeout error for {clean_url}")
-    except WebDriverException as e:
+    except WebDriverException:
         logging.warning(f"[capture_screenshot_and_har] WebDriver error for {clean_url}")
     except Exception as e:
         logging.error(f"[capture_screenshot_and_har] Unexpected error: {clean_url} {e}")

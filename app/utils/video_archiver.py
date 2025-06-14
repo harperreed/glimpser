@@ -316,7 +316,6 @@ def create_blank_video(
 
 
 def get_video_duration(video_path):
-
     if not os.path.exists(video_path):  # raise?
         return None
 
@@ -674,7 +673,6 @@ def _compile_to_video_inner(camera_path, video_path) -> bool:
             logging.error("FFmpeg command failed: %s", e)
 
         finally:
-
             if os.path.exists(temp_file_path):
                 os.remove(temp_file_path)  # Clean up the temporary file
 
@@ -701,7 +699,6 @@ def _compile_to_video_inner(camera_path, video_path) -> bool:
 
 
 def _old_compile_to_video_inner(camera_path, video_path) -> bool:
-
     os.makedirs(video_path, exist_ok=True)
     os.makedirs(camera_path, exist_ok=True)
 
@@ -884,5 +881,5 @@ def archive_screenshots():
 
         try:
             compile_to_video(camera_path, video_path)
-        except Exception as e:
+        except Exception:
             logging.exception("Failed to compile video for camera %s", camera_name)

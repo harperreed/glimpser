@@ -40,7 +40,6 @@ class ChatGPTImageComparison:
     def compare_images(
         self, prompt, image_paths, max_size=512, low_res=False, tokens=48
     ):
-
         global last_429_error_time
 
         if not self.api_key:
@@ -136,7 +135,6 @@ class ChatGPTImageComparison:
 
 
 def chatgpt_compare(prompt, image_paths, template_name=None):
-
     # Check if all images exist
     for image in image_paths:
         if not os.path.exists(image):

@@ -2,10 +2,100 @@
 requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[tool.black]
+[tool.setuptools.packages.find]
+include = ["app*"]
+exclude = ["tests*", "logs*", "data*"]
+
+[project]
+name = "glimpser"
+version = "1.0.0"
+description = "Real-time monitoring application with RTSP streaming and AI integration"
+requires-python = ">=3.11"
+dependencies = [
+    "alembic==1.16.1",
+    "APScheduler==3.11.0",
+    "fake-useragent==2.2.0",
+    "Flask==3.1.1",
+    "Flask-APScheduler==1.13.1",
+    "Flask-Login==0.6.3",
+    "Jinja2==3.1.6",
+    "numpy>=1.26,<2.0",
+    "pdf2image==1.17.0",
+    "Pillow==11.2.1",
+    "psutil~=7.0.0",
+    "pyvirtualdisplay==3.0",
+    "selenium==4.33.0",
+    "SQLAlchemy==2.0.41",
+    "pywebpush==2.0.3",
+    "onnxruntime-gpu==1.18.0",
+    "undetected-chromedriver==3.5.5",
+    "webdriver-manager==4.0.2",
+    "Werkzeug==3.1.3",
+    "yt-dlp==2025.5.22",
+    "pynput==1.8.1",
+    "python-dateutil",
+    "python-dotenv",
+    "setproctitle==1.3.3",
+    "filelock>=3.18.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit>=3.6",
+    "ruff>=0.6.0",
+    "mypy>=1.16",
+    "pytest>=8.3,<8.5",
+    "coverage>=7.5",
+    "pyinstaller>=6.6",
+    "pytest-socket>=0.7",
+    "detect-secrets>=1.4",
+]
+docs = [
+    "mkdocs>=1.6",
+]
+
+[project.scripts]
+glimpser = "main:main"
+glimpser-clear = "main:clear_console_cli"
+glimpser-dashboard = "app.utils.console_dashboard:main"
+
+[tool.ruff]
 line-length = 88
-target-version = ["py311"]
-required-version = "25.1.0"
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "ARG", # flake8-unused-arguments
+    "SIM", # flake8-simplify
+    "TCH", # flake8-type-checking
+    "PIE", # flake8-pie
+    "A",   # flake8-builtins
+]
+ignore = [
+    "E501",   # line too long, handled by formatter
+    "B008",   # do not perform function calls in argument defaults
+    "C901",   # too complex
+    "SIM102", # use a single if-statement
+    "SIM108", # use ternary operator instead of if-else
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+force-single-line = false
+combine-as-imports = true
 
 [tool.mypy]
 python_version = "3.11"

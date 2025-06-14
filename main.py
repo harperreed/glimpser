@@ -1,7 +1,6 @@
 #!./env/bin/python3
 #  main.py
 
-import argparse
 import atexit
 import logging
 import os
@@ -290,13 +289,18 @@ def display_startup_tips():
 
 def _format_table(rows, headers):
     col_widths = [
-        max(len(str(item)) for item in column) for column in zip(headers, *rows)
+        max(len(str(item)) for item in column)
+        for column in zip(headers, *rows, strict=False)
     ]
-    header = " | ".join(h.ljust(w) for h, w in zip(headers, col_widths))
+    header = " | ".join(h.ljust(w) for h, w in zip(headers, col_widths, strict=False))
     separator = "-+-".join("-" * w for w in col_widths)
     lines = [header, separator]
     for row in rows:
-        lines.append(" | ".join(str(item).ljust(w) for item, w in zip(row, col_widths)))
+        lines.append(
+            " | ".join(
+                str(item).ljust(w) for item, w in zip(row, col_widths, strict=False)
+            )
+        )
     return "\n".join(lines)
 
 

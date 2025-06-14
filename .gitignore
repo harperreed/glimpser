@@ -119,3 +119,4 @@ output.txt
 # Node artifacts
 node_modules/
 package-lock.json
+cookies.txt

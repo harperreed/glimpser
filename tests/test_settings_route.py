@@ -147,7 +147,7 @@ class TestSettingsRoute(unittest.TestCase):
         self.assertTrue(os.path.exists(self.backup_path))
 
         # Prepare upload with modified value
-        with open(self.backup_path, "r") as f:
+        with open(self.backup_path) as f:
             data = f.read()
         import json
 
