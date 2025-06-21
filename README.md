@@ -121,11 +121,18 @@ If you cannot log in or see video feeds, double-check that your `.env` file matc
 
 ### Developer Dependencies
 
+**Note: This project has migrated from pip to uv for dependency management.**
+
 To install Python packages required for development, run:
 
 ```sh
-pip install -r requirements.txt
-pip install -r requirements-dev.txt
+uv sync --group dev
+```
+
+Legacy pip installation (deprecated):
+```sh
+pip install -r requirements.txt.bak
+pip install -r requirements-dev.txt.bak
 ```
 
 Then install linters and JavaScript tools with `make setup` (or `scripts/setup_env.sh`).
@@ -206,8 +213,7 @@ To set up the project for development:
 3. Install Python dependencies:
 
    ```sh
-   pip install -r requirements.txt
-   pip install -r requirements-dev.txt
+   uv sync --group dev
    ```
 
 4. Install developer tooling:
@@ -240,7 +246,7 @@ From [Developer Guide](docs/developer_guide.md):
 
 1. Install the tooling and Git hooks (or run `make setup`):
    ```sh
-   pip install -r requirements-dev.txt
+   uv sync --group dev
    npm install
    pre-commit install
    ```
