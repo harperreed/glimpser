@@ -23,7 +23,7 @@ fi
 echo "Building Debian package..."
 mkdir -p debian/glimpser/opt/glimpser || { echo "Failed to create directory"; exit 1; }
 rsync -a app/ debian/glimpser/opt/glimpser/app/ || { echo "Failed to sync app directory"; exit 1; }
-cp requirements.txt debian/glimpser/opt/glimpser/ || { echo "Failed to copy requirements.txt"; exit 1; }
+cp pyproject.toml uv.lock debian/glimpser/opt/glimpser/ || { echo "Failed to copy pyproject.toml and uv.lock"; exit 1; }
 rsync -a data/ debian/glimpser/opt/glimpser/data/ || { echo "Failed to sync data directory"; exit 1; }
 mkdir -p debian/glimpser/etc/systemd/system || { echo "Failed to create systemd directory"; exit 1; }
 cat > debian/glimpser/etc/systemd/system/glimpser.service << EOL || { echo "Failed to create service file"; exit 1; }
@@ -50,7 +50,7 @@ Section: utils
 Priority: optional
 Architecture: all
 Maintainer: Kristopher Kubicki <kristopher@glimpser.net>
-Depends: python3, python3-pip
+Depends: python3
 Description: Glimpser - A web monitoring and screenshot tool
  Glimpser is a powerful tool for monitoring websites and capturing
  screenshots. It provides features for scheduling, archiving, and
@@ -67,13 +67,11 @@ echo "Debian package built successfully."
 
 # Build Windows executable if PyInstaller is available
 echo "Building Windows executable..."
-if ! python3 -m pip show pyinstaller >/dev/null 2>&1; then
-    if ! python3 -m pip install pyinstaller >/dev/null 2>&1; then
-        echo "PyInstaller not available; skipping Windows executable build."
-        exit 0
-    fi
+if ! command_exists uv; then
+    echo "uv not available; skipping Windows executable build."
+    exit 0
 fi
 
-python3 build_windows.py && echo "Windows executable built successfully." || echo "Failed to build Windows executable"
+uv run python build_windows.py && echo "Windows executable built successfully." || echo "Failed to build Windows executable"
 
 echo "Build process completed. You can find the packages in the current directory."

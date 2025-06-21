@@ -1,2 +1,16 @@
 data
 logs
+.venv
+.git
+.gitignore
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+.coverage
+.env
+.env.local
+*.log
+.DS_Store
+Thumbs.db

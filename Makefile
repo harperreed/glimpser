@@ -1,21 +1,21 @@
 .PHONY: format lint test test-js precommit setup
 
 format:
-	black .
+	uv run black .
 	prettier --write app/static/js/**/*.js app/static/css/**/*.css
 
 lint:
-	flake8
+	uv run flake8
 	eslint 'app/static/js/**/*.js'
 
 test:
-	pytest
+	uv run pytest
 
 test-js:
 	npm test
 
 precommit:
-        pre-commit run --all-files
+	uv run pre-commit run --all-files
 
 setup:
-        ./scripts/setup_env.sh
+	./scripts/setup_env.sh
