@@ -2,9 +2,18 @@
 # Set up local development environment
 set -e
 
-pip install -r requirements.txt
-if [ -f requirements-dev.txt ]; then
-    pip install -r requirements-dev.txt
+# Check if uv is installed
+if ! command -v uv &> /dev/null; then
+    echo "uv is not installed. Please install uv first:"
+    echo "curl -LsSf https://astral.sh/uv/install.sh | sh"
+    exit 1
 fi
+
+# Install Python dependencies
+uv sync --group dev
+
+# Install JavaScript dependencies
 npm install
-pre-commit install
+
+# Install pre-commit hooks
+uv run pre-commit install

@@ -1,6 +1,9 @@
 # Use an official Python runtime as a parent image
 FROM python:3.12-slim
 
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 libsqlite3-0 curl iputils-ping net-tools netcat-traditional \
@@ -28,9 +31,9 @@ RUN CHROME_DRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_
 # Set work directory
 WORKDIR /app
 
-# Copy requirements and install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt gunicorn
+# Copy dependency files and install Python dependencies
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev && uv pip install gunicorn
 
 # Copy application code
 COPY . .
@@ -47,4 +50,4 @@ RUN mkdir -p /app/db /app/logs /app/screenshots /app/videos /app/summaries
 EXPOSE 8082
 
 # Run the application
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8082", "wsgi:app"]
+CMD ["uv", "run", "gunicorn", "-w", "4", "-b", "0.0.0.0:8082", "wsgi:app"]
