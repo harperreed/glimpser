@@ -37,6 +37,7 @@ dependencies = [
     "onnxruntime-gpu~=1.18; sys_platform != 'darwin'",
     "onnxruntime~=1.18; sys_platform == 'darwin'",
     "gunicorn>=22.0.0",
+    "rich>=13.0.0",
 ]
 
 [tool.hatch.build.targets.wheel]
