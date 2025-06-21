@@ -1,10 +1,14 @@
-# Use an official Python runtime as a parent image
-FROM python:3.12-slim
+# Multi-stage build for glimpser application
 
-# Install uv
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+###########################################
+# Base stage - System dependencies
+###########################################
+FROM python:3.12-slim as base
 
-# Install system dependencies
+# Install uv with pinned version for reproducibility
+COPY --from=ghcr.io/astral-sh/uv:0.4.30 /uv /usr/local/bin/uv
+
+# Install system dependencies in a single layer
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 libsqlite3-0 curl iputils-ping net-tools netcat-traditional \
     libsqlite3-dev libjpeg62-turbo libpng16-16 libtiff6 libfreetype6 \
@@ -14,9 +18,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Google Chrome
-RUN wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-linux-signing-keyring.gpg 
-    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list 
-    && apt-get update && apt-get install -y google-chrome-stable 
+RUN wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-linux-signing-keyring.gpg \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update && apt-get install -y google-chrome-stable \
     && rm -rf /var/lib/apt/lists/*
 
 # Install ChromeDriver
@@ -28,20 +32,38 @@ RUN CHROME_DRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_
     && chown root:root /usr/local/bin/chromedriver \
     && chmod 0755 /usr/local/bin/chromedriver
 
-# Set work directory
+###########################################
+# Dependencies stage - Python packages
+###########################################
+FROM base as deps
+
 WORKDIR /app
 
-# Copy dependency files and install Python dependencies
+# Set environment for UV
+ENV UV_SYSTEM_PYTHON=true
+
+# Copy dependency files for better layer caching
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-dev && uv pip install gunicorn
+
+# Install dependencies only (not the project itself) for better caching
+RUN uv sync --frozen --no-dev --no-install-project
+
+###########################################
+# Application stage - Final runtime
+###########################################
+FROM deps as app
 
 # Copy application code
 COPY . .
 
+# Install the project itself and compile bytecode for faster startup
+RUN uv sync --frozen --no-dev --compile-bytecode
+
 # Set environment variables
 ENV FLASK_APP=main.py \
     FLASK_RUN_HOST=0.0.0.0 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    UV_SYSTEM_PYTHON=true
 
 # Create necessary directories
 RUN mkdir -p /app/db /app/logs /app/screenshots /app/videos /app/summaries
@@ -49,5 +71,5 @@ RUN mkdir -p /app/db /app/logs /app/screenshots /app/videos /app/summaries
 # Expose port
 EXPOSE 8082
 
-# Run the application
+# Run the application using uv
 CMD ["uv", "run", "gunicorn", "-w", "4", "-b", "0.0.0.0:8082", "wsgi:app"]
