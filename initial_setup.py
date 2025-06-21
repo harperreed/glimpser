@@ -28,7 +28,11 @@ console = Console()
 
 
 def create_tables(conn):
-    """Create all required database tables if they don't exist."""
+    """
+    Create all required SQLite database tables for the Glimpser application if they do not already exist.
+    
+    This includes tables for application settings, users, templates, summaries, push notification subscriptions, and offline jobs. Commits the schema changes to the database.
+    """
     cursor = conn.cursor()
 
     # Settings table
@@ -139,7 +143,11 @@ def create_tables(conn):
 
 
 def upsert_setting(conn, name, value):
-    """Insert or update a setting in the database."""
+    """
+    Insert or update a configuration setting in the database by name.
+    
+    If a setting with the given name exists, its value is updated; otherwise, a new setting is inserted. Does nothing if the value is None.
+    """
     if value is None:
         return
 
@@ -156,7 +164,11 @@ def upsert_setting(conn, name, value):
 
 
 def upsert_user(conn, username, password_hash, role):
-    """Insert or update a user record."""
+    """
+    Insert a new user or update an existing user's password hash and role in the database.
+    
+    If a user with the given username already exists, their password hash and role are updated.
+    """
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -172,7 +184,15 @@ def upsert_user(conn, username, password_hash, role):
 
 
 def insert_template(conn, template_data):
-    """Insert a template if it doesn't already exist."""
+    """
+    Insert a new template into the database if a template with the same name does not already exist.
+    
+    Parameters:
+        template_data (dict): Dictionary containing template fields and their values.
+    
+    Returns:
+        bool: True if the template was inserted, False if a template with the same name already exists.
+    """
     cursor = conn.cursor()
 
     # Check if template already exists
@@ -193,7 +213,11 @@ def insert_template(conn, template_data):
 
 
 def setup_default_settings(conn):
-    """Configure sane default settings for the application."""
+    """
+    Populate the database with default configuration settings for the Glimpser application.
+    
+    This function inserts or updates a comprehensive set of default settings covering application basics, security, performance, capture, UI, browser, scheduler, hardware acceleration, and feature toggles. Existing settings are updated; missing ones are created.
+    """
     with console.status("[bold green]Setting up default configuration..."):
         # Application basics
         upsert_setting(conn, "NAME", "Glimpser")
@@ -254,7 +278,11 @@ def setup_default_settings(conn):
 
 
 def create_example_templates(conn):
-    """Create example templates to help users get started."""
+    """
+    Insert a set of predefined example templates into the database to help users get started with common use cases.
+    
+    Creates templates for public webcams, news sites, IP cameras, YouTube livestreams, airport tracking, and weather forecasts. Only inserts templates that do not already exist. Displays the number of templates created.
+    """
     with console.status("[bold blue]Creating example templates..."):
         # Example 1: Public webcam (snapshot only)
         template1 = {
@@ -389,7 +417,9 @@ def create_example_templates(conn):
 
 
 def create_directories():
-    """Create necessary application directories."""
+    """
+    Create all required directories for application data storage and logs if they do not already exist.
+    """
     directories = [
         "data",
         "data/screenshots",
@@ -407,7 +437,14 @@ def create_directories():
 
 
 def interactive_setup():
-    """Run fully interactive setup with rich interface."""
+    """
+    Launches an interactive setup wizard for the Glimpser application using a rich terminal interface.
+    
+    Guides the user through configuring the database path, admin credentials, API key, and optional example templates. Presents a summary for confirmation before proceeding. On confirmation, creates required directories, initializes the database schema, sets up default settings, creates the admin user, configures security keys, and optionally adds example templates. Handles user cancellation and setup errors gracefully.
+    
+    Returns:
+        int: 0 if setup completes successfully, 1 if cancelled or an error occurs.
+    """
 
     # Welcome screen
     console.print()
@@ -569,7 +606,14 @@ def interactive_setup():
 
 
 def main():
-    """Main setup function."""
+    """
+    Handles the initial setup process for the Glimpser application in both interactive and command-line modes.
+    
+    Parses command-line arguments to configure the database path, admin credentials, secret key, API key, and template creation options. If no arguments are provided, launches an interactive setup wizard. Otherwise, performs non-interactive setup by creating required directories, initializing the database schema, configuring default settings, creating or updating the admin user, setting security keys, and optionally adding example templates. Provides rich console feedback and returns an exit code indicating success or failure.
+    
+    Returns:
+        int: 0 if setup completes successfully, 1 if an error occurs.
+    """
     parser = argparse.ArgumentParser(description="Initial setup for Glimpser")
     parser.add_argument("--db-path", type=str, help="Path to SQLite database file")
     parser.add_argument("--username", type=str, help="Admin username")
