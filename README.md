@@ -61,18 +61,26 @@ See [OpenSSF Scorecard](docs/scorecard.md) for details on the security badge.
 
 ### Prerequisites
 
-- Python 3.8 to 3.13
+- Python 3.11 to 3.13
+- [uv](https://docs.astral.sh/uv/) (recommended) or pip
 
 ### Steps
 
 1. **Install the Package**
 
+   Using pip (traditional method):
    ```sh
    pip install glimpser
    ```
 
-   Or, if you want to install from source:
+   **For Development (Recommended):** Install from source with uv:
+   ```sh
+   git clone https://github.com/KristopherKubicki/glimpser.git
+   cd glimpser
+   uv sync
+   ```
 
+   Or install from source with pip:
    ```sh
    git clone https://github.com/KristopherKubicki/glimpser.git
    cd glimpser
@@ -81,25 +89,34 @@ See [OpenSSF Scorecard](docs/scorecard.md) for details on the security badge.
 
 2. **Run the Application**
 
-```sh
-glimpser
-```
+   If installed with pip:
+   ```sh
+   glimpser
+   ```
+
+   If using uv from source:
+   ```sh
+   uv run python main.py
+   ```
 
 You can pass command-line options to customize the runtime configuration. The most
 common flags are:
 
+**If installed with pip:**
 ```sh
-# Start without the background scheduler
-glimpser --no-scheduler
-
-# Skip scheduling crawler jobs
-glimpser --no-crawlers
-
-# Disable the watchdog thread
-glimpser --no-watchdog
+glimpser --no-scheduler    # Start without the background scheduler
+glimpser --no-crawlers     # Skip scheduling crawler jobs  
+glimpser --no-watchdog     # Disable the watchdog thread
+glimpser --help            # See all available options
 ```
 
-Run `glimpser --help` to see all available options.
+**If using uv from source:**
+```sh
+uv run python main.py --no-scheduler    # Start without the background scheduler
+uv run python main.py --no-crawlers     # Skip scheduling crawler jobs
+uv run python main.py --no-watchdog     # Disable the watchdog thread
+uv run python main.py --help            # See all available options
+```
 
 For a full description of every command-line flag, including the separate credentials utility, see [docs/command_line.md](docs/command_line.md).
 
@@ -121,21 +138,38 @@ If you cannot log in or see video feeds, double-check that your `.env` file matc
 
 ### Developer Dependencies
 
-**Note: This project has migrated from pip to uv for dependency management.**
+**Note: This project uses [uv](https://docs.astral.sh/uv/) for dependency management.**
 
-To install Python packages required for development, run:
+#### Quick Setup
 
 ```sh
-uv sync --group dev
+# Install uv if you haven't already
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install all dependencies and set up development environment
+make setup
 ```
 
-Legacy pip installation (deprecated):
+#### Manual Setup
+
+```sh
+# Install Python dependencies (production + development)
+uv sync --group dev
+
+# Install JavaScript dependencies  
+npm install
+
+# Install pre-commit hooks
+uv run pre-commit install
+```
+
+#### Legacy pip installation (deprecated)
+
+For compatibility with older setups:
 ```sh
 pip install -r requirements.txt.bak
 pip install -r requirements-dev.txt.bak
 ```
-
-Then install linters and JavaScript tools with `make setup` (or `scripts/setup_env.sh`).
 
 ## Usage
 
@@ -155,6 +189,14 @@ Open the **Discover** tab under **Settings** to scan your network for ONVIF, RTS
 
 To ensure everything works as expected, you can run the included unit tests:
 
+**With uv (recommended):**
+```sh
+uv run python -m coverage run -m pytest
+# Or use the Makefile
+make test
+```
+
+**With pip:**
 ```sh
 python -m coverage run -m pytest
 ```
@@ -194,73 +236,110 @@ This allows external NVR software to ingest the stream as a basic camera source.
 
 ## Development
 
-To set up the project for development:
+### Quick Start
+
+1. **Install uv** (if not already installed):
+   ```sh
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
+
+2. **Clone and set up the project:**
+   ```sh
+   git clone https://github.com/KristopherKubicki/glimpser.git
+   cd glimpser
+   make setup  # Installs all dependencies and sets up pre-commit hooks
+   ```
+
+3. **Start developing:**
+   ```sh
+   # Run the application
+   uv run python main.py
+   
+   # Run tests
+   make test
+   
+   # Format and lint code
+   make format
+   make lint
+   ```
+
+### Manual Development Setup
 
 1. Clone the repository:
-
    ```sh
    git clone https://github.com/KristopherKubicki/glimpser.git
    cd glimpser
    ```
 
-2. Create a virtual environment and activate it:
-
-   ```sh
-   python -m venv env
-   source env/bin/activate  # On Windows, use `env\Scripts\activate`
-   ```
-
-3. Install Python dependencies:
-
+2. Install dependencies with uv:
    ```sh
    uv sync --group dev
+   npm install
+   uv run pre-commit install
    ```
 
-4. Install developer tooling:
-
+3. **Available Commands:**
    ```sh
-   make setup  # runs scripts/setup_env.sh
+   make format   # Format code with black and prettier
+   make lint     # Run linters (flake8, eslint)
+   make test     # Run Python tests with coverage
+   make test-js  # Run JavaScript tests with coverage
+   make precommit # Run all pre-commit hooks
    ```
 
-5. Run tests:
+### Legacy Development Setup (pip)
+
+If you prefer to use pip instead of uv:
+
+1. Create and activate a virtual environment:
    ```sh
-   pytest
+   python -m venv env
+   source env/bin/activate  # On Windows: env\Scripts\activate
    ```
-6. Run JavaScript tests with coverage:
+
+2. Install dependencies:
    ```sh
-   npm test -- --coverage
-   ```
-7. Use the Makefile for common tasks:
-   ```sh
-   make format   # format code
-   make lint     # run linters
-   make test     # run Python tests
-   make test-js  # run JavaScript tests
-   make precommit
+   pip install -r requirements.txt.bak
+   pip install -r requirements-dev.txt.bak
+   npm install
+   pre-commit install
    ```
    See [Developer Guide](docs/developer_guide.md) for details.
 
 ### Linting & Testing
 
-From [Developer Guide](docs/developer_guide.md):
+**With uv (recommended):**
+```sh
+# Install tooling and Git hooks
+make setup
 
-1. Install the tooling and Git hooks (or run `make setup`):
-   ```sh
-   uv sync --group dev
-   npm install
-   pre-commit install
-   ```
-2. Verify hooks and run linters:
-   ```sh
-   pre-commit run --all-files
-   flake8
-   ```
-3. Execute the test suites:
-   ```sh
-   pytest
-   npm test
-   ```
-   Coverage instructions live in [docs/testing.md](docs/testing.md).
+# Run linters and formatters
+make lint
+make format
+
+# Run all pre-commit hooks
+make precommit
+
+# Run test suites
+make test      # Python tests with coverage
+make test-js   # JavaScript tests with coverage
+```
+
+**Manual commands:**
+```sh
+# Run specific tools
+uv run flake8
+uv run black .
+uv run pytest
+uv run pre-commit run --all-files
+
+# JavaScript testing
+npm test
+npm run lint:js
+npm run format:js:write
+```
+
+Coverage instructions live in [docs/testing.md](docs/testing.md).
 
 ## Releases
 
